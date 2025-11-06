@@ -2,6 +2,12 @@ import { notFound } from 'next/navigation';
 import ProductDetail from '@/components/products/ProductDetail';
 import { MOCK_PRODUCTS } from '@/lib/mockData';
 
+export function generateStaticParams() {
+  return MOCK_PRODUCTS.map((product) => ({
+    id: product.id,
+  }));
+}
+
 export default function ProductPage({ params }: { params: { id: string } }) {
   const product = MOCK_PRODUCTS.find((p) => p.id === params.id);
 

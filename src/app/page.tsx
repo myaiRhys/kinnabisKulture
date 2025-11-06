@@ -4,30 +4,43 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import ProductCard from '@/components/products/ProductCard';
 import { MOCK_PRODUCTS } from '@/lib/mockData';
+import { useEffect, useState } from 'react';
 
 export default function HomePage() {
+  const [floatingLeaves, setFloatingLeaves] = useState<Array<{x: number, y: number, delay: number}>>([]);
+
+  useEffect(() => {
+    // Generate random positions for floating leaves
+    const leaves = Array.from({ length: 30 }, () => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 2,
+    }));
+    setFloatingLeaves(leaves);
+  }, []);
+
+  const featuredProducts = MOCK_PRODUCTS.slice(0, 8);
+
   return (
-    <div className="min-h-screen">
+    <div>
       {/* Hero Section */}
       <section className="relative h-screen bg-gradient-hero flex items-center justify-center overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
+        {/* Animated floating leaves */}
+        <div className="absolute inset-0 pointer-events-none">
+          {floatingLeaves.map((leaf, i) => (
             <motion.div
               key={i}
-              className="absolute text-6xl opacity-20"
-              initial={{
-                x: typeof window !== 'undefined' ? Math.random() * window.innerWidth : Math.random() * 1000,
-                y: typeof window !== 'undefined' ? Math.random() * window.innerHeight : Math.random() * 800
-              }}
+              className="absolute text-5xl opacity-20"
+              style={{ left: `${leaf.x}%`, top: `${leaf.y}%` }}
               animate={{
-                y: [0, -30, 0],
+                y: [-20, 20, -20],
                 rotate: [0, 180, 360],
+                opacity: [0.1, 0.3, 0.1],
               }}
               transition={{
-                duration: 3 + Math.random() * 2,
+                duration: 4 + Math.random() * 2,
                 repeat: Infinity,
-                delay: Math.random() * 2,
+                delay: leaf.delay,
               }}
             >
               🍃
@@ -36,12 +49,12 @@ export default function HomePage() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 text-center text-white px-4">
+        <div className="relative z-10 text-center text-white px-4 max-w-4xl">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-6xl md:text-8xl font-bold mb-6"
+            transition={{ duration: 1 }}
+            className="text-6xl md:text-8xl font-extrabold mb-6 leading-tight"
           >
             Premium Cannabis
             <br />
@@ -49,93 +62,112 @@ export default function HomePage() {
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto"
+            transition={{ duration: 1, delay: 0.2 }}
+            className="text-xl md:text-2xl mb-10 leading-relaxed"
           >
-            Experience the finest selection of cannabis products,
-            delivered securely to your door.
+            South Africa&apos;s finest selection of cannabis products.
+            <br />Secure, discreet, and delivered to your door.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link href="/products" className="btn-primary text-lg">
+            <Link href="/products" className="btn-primary text-lg px-10 py-4">
               Shop Now
+            </Link>
+            <Link href="/about" className="btn-secondary text-lg px-10 py-4">
+              Learn More
             </Link>
           </motion.div>
         </div>
 
-        {/* TODO: Add age gate check on first visit */}
+        {/* Scroll indicator */}
+        <motion.div
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <div className="w-6 h-10 border-2 border-white rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-white rounded-full mt-2"></div>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Category Section */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-4xl font-bold text-center mb-12">
-          Shop by Category
-        </h2>
+      {/* Categories */}
+      <section className="py-20 container mx-auto px-4">
+        <h2 className="text-5xl font-bold text-center mb-16">Shop by Category</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {['Flower', 'Edibles', 'Paraphernalia'].map((category) => (
-            <Link
-              key={category}
-              href={`/products?category=${category.toLowerCase()}`}
-              className="group"
-            >
-              <div className="relative h-64 bg-gradient-card rounded-xl overflow-hidden card-hover">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <h3 className="text-3xl font-bold text-white group-hover:scale-110 transition-transform">
-                    {category}
-                  </h3>
+          {[
+            { name: 'Flower', emoji: '🌸', category: 'flower' },
+            { name: 'Edibles', emoji: '🍪', category: 'edibles' },
+            { name: 'Accessories', emoji: '💨', category: 'paraphernalia' },
+          ].map((cat) => (
+            <Link key={cat.category} href={`/products?category=${cat.category}`}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="relative h-64 bg-gradient-card rounded-2xl overflow-hidden card-hover cursor-pointer group"
+              >
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-300"></div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                  <div className="text-7xl mb-4 group-hover:scale-125 transition-transform duration-300">
+                    {cat.emoji}
+                  </div>
+                  <h3 className="text-3xl font-bold">{cat.name}</h3>
                 </div>
-              </div>
+              </motion.div>
             </Link>
           ))}
         </div>
       </section>
 
       {/* Featured Products */}
-      <section className="container mx-auto px-4 py-16 bg-gray-100">
-        <h2 className="text-4xl font-bold text-center mb-12">
-          Featured Products
-        </h2>
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-5xl font-bold text-center mb-4">Featured Products</h2>
+          <p className="text-center text-gray-600 mb-16 text-lg">
+            Hand-picked selection of our best sellers
+          </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {MOCK_PRODUCTS.slice(0, 8).map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
 
-        <div className="text-center mt-12">
-          <Link href="/products" className="btn-primary">
-            View All Products
-          </Link>
+          <div className="text-center mt-12">
+            <Link href="/products" className="btn-primary text-lg">
+              View All Products
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          <div>
-            <div className="text-4xl mb-4">🔒</div>
-            <h3 className="text-xl font-semibold mb-2">Secure & Private</h3>
-            <p className="text-gray-600">POPIA compliant. Your data is safe with us.</p>
-          </div>
-
-          <div>
-            <div className="text-4xl mb-4">🚚</div>
-            <h3 className="text-xl font-semibold mb-2">Fast Delivery</h3>
-            <p className="text-gray-600">Same-day delivery within Cape Town metro.</p>
-          </div>
-
-          <div>
-            <div className="text-4xl mb-4">✅</div>
-            <h3 className="text-xl font-semibold mb-2">Age Verified</h3>
-            <p className="text-gray-600">Strict age verification for all orders.</p>
-          </div>
+      {/* Trust Badges */}
+      <section className="py-20 container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+          {[
+            { icon: '🔒', title: 'Secure & Private', desc: 'POPIA compliant. Your data is encrypted and protected.' },
+            { icon: '🚚', title: 'Fast Delivery', desc: 'Same-day delivery in Cape Town. Nationwide in 2-3 days.' },
+            { icon: '✅', title: 'Age Verified', desc: 'Strict ID verification. 21+ only. Legal compliance guaranteed.' },
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.2 }}
+              viewport={{ once: true }}
+            >
+              <div className="text-6xl mb-4">{item.icon}</div>
+              <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
+              <p className="text-gray-600 text-lg">{item.desc}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
     </div>
