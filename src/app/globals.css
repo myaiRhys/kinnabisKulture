@@ -18,10 +18,20 @@
   .btn-primary {
     @apply bg-gradient-to-r from-cannabis-500 to-sky-500 text-white px-6 py-3 rounded-lg font-semibold
            hover:from-cannabis-600 hover:to-sky-600 transition-all duration-300
-           shadow-lg hover:shadow-xl transform hover:scale-105;
+           shadow-lg hover:shadow-xl transform hover:scale-105 inline-block text-center;
+  }
+
+  .btn-secondary {
+    @apply bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold
+           border-2 border-white hover:bg-white/20 transition-all duration-300
+           shadow-lg hover:shadow-xl transform hover:scale-105 inline-block text-center;
   }
 
   .card-hover {
     @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-2;
+  }
+
+  .container {
+    @apply max-w-7xl mx-auto px-4;
   }
 }
